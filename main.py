@@ -23,7 +23,7 @@ def parse_args():
     parser_list = subparser.add_parser(FEATURIZE_COMMAND)
     parser_list.add_argument('image_directory', help='the directory where candidate images can be found')
     parser_list.add_argument('output_file', help='the output file where we\'ll store our features')
-    parser_list.add_argument('processes', nargs='?', const=4, type=int,
+    parser_list.add_argument('--processes', nargs='?', const=4, type=int,
                              help='the directory where candidate images can be found')
 
     parser_compare = subparser.add_parser(BUILD_COMMAND)
