@@ -94,14 +94,14 @@ def _compute_options_concurrent_(target_image, children_filenames, candidate_fea
     """
 
     tiles = split_img_into_tiles(target_image, tile_width, tile_height)
-    tuples = []
+    dicts = []
     for r, row in enumerate(tiles):
         for c, tile in enumerate(row):
-            tuples.append({'row': r, 'column': c, 'tile': tile, 'tile_id': r * len(row) + c})
+            dicts.append({'row': r, 'column': c, 'tile': tile, 'tile_id': r * len(row) + c})
 
     with multiprocessing.Pool(processes=processes) as pool:
         result_dict_lists = list(
-            tqdm.tqdm(pool.imap(partial(get_closest_children, children_filenames=children_filenames, children_features=candidate_features, choices=candidate_choices, metric_func=metric_func), tuples), total=len(tuples)))
+            tqdm.tqdm(pool.imap(partial(get_closest_children, children_filenames=children_filenames, children_features=candidate_features, choices=candidate_choices, metric_func=metric_func), dicts), total=len(dicts)))
 
     return pd.DataFrame(list(np.array(result_dict_lists).flatten()))
 
