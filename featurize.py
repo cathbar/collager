@@ -7,6 +7,12 @@ from image_utils import *
 import tqdm
 
 def featurize_image(img, normalize=True):
+    """
+    Featurize an image
+    :param img: The image, duh
+    :param normalize: Normalize the histogram counts by the pixel count
+    :return:
+    """
     hist = np.array(img.histogram())
     if normalize:
         hist = hist / (img.size[0] * img.size[1])
@@ -25,16 +31,16 @@ def featurize_image_file(filename: str):
     return feature_dict
 
 
-def featurize_directory(directory: str, processes: int = 1, output_csv: str = None):
+def featurize_directory(directory: str, output_file: str, processes: int = 1):
     """
     Recursively featurize a directory's images.
     :param directory: The directory to scan
+    :param output_file: Where to write these features
     :param processes: How many subprocesses to allow to featurize
-    :param output_csv: Where to write these features
     :return:
     """
 
-    filenames = Path(directory).glob('**/*.jpg')
+    filenames = Path(directory).glob('**/[!.]*.jpg')
     results = []
     filename_list = list(filenames)
     if processes > 1:
@@ -45,6 +51,5 @@ def featurize_directory(directory: str, processes: int = 1, output_csv: str = No
         for filename in tqdm.tqdm(filename_list, total=len(filename_list)):
             results.append(featurize_image_file(filename))
     df = pd.DataFrame(results).set_index('filename')
-    if output_csv:
-        df.to_csv(output_csv)
+    df.to_pickle(output_file)
     return df
