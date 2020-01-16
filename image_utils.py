@@ -1,4 +1,5 @@
 from PIL import Image
+import math
 
 def get_aspect_ratio(img):
     """
@@ -44,10 +45,10 @@ def split_img_into_tiles(im, width, height):
 
     imgwidth, imgheight = im.size
     rows = []
-    for i in range(0,imgheight,height):
+    for i in range(0,height * math.ceil(float(imgheight)/height), height):
         columns = []
-        for j in range(0,imgwidth,width):
-            box = (j, i, j+width, i+height)
+        for j in range(0, width * math.ceil(float(imgwidth)/width), width):
+            box = (min(j, imgwidth-width), min(i, imgheight-height), min(j+width, imgwidth), min(i+height, imgheight))
             a = im.crop(box)
             columns.append(a)
         rows.append(columns)
@@ -64,7 +65,7 @@ def split_img_file_into_tiles(filename, width, height):
 
     return split_img_into_tiles(Image.open(filename), width, height)
 
-def crop_image(im, width, height):
+def crop_image(im, width, height, center=True):
     """
     Crop an image to a new width and height by cutting the edges.
     :param im:
@@ -74,7 +75,9 @@ def crop_image(im, width, height):
     """
 
     imgwidth, imgheight = im.size
-    box = (int(imgwidth/2)-int(width/2), int(imgheight/2)-int(height/2), int(imgwidth/2) + width - int(width/2), int(imgheight/2) + height - int(height/2))
+    box = (0, 0, width, height)
+    if center:
+        box = (int(imgwidth/2)-int(width/2), int(imgheight/2)-int(height/2), int(imgwidth/2) + width - int(width/2), int(imgheight/2) + height - int(height/2))
     return im.crop(box)
 
 def crop_image_to_aspect_ratio(im, desired_aspect_ratio):
