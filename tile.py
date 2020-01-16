@@ -4,6 +4,8 @@ from image_utils import resize_image, crop_image, crop_image_to_aspect_ratio
 import tqdm
 import multiprocessing
 from functools import partial
+import os
+import math
 
 def tile_old(tile_filename: str, output_filename: str, output_width: int, output_height: int, choice: int = 0, crop: bool = True):
     """
@@ -139,8 +141,8 @@ def tile(tile_filename: str, output_filename: str, output_width: int, output_hei
     row_count = df['row'].max()+1
 
 
-    tile_width = int(output_width / column_count)
-    tile_height = int(output_height / row_count)
+    tile_width = math.ceil(float(output_width)/ column_count)
+    tile_height = math.ceil(float(output_height) / row_count)
     result = Image.new('RGB', (column_count * tile_width, row_count * tile_height))
     tuples = []
 
@@ -175,7 +177,11 @@ def tile(tile_filename: str, output_filename: str, output_width: int, output_hei
         result.paste(
             im=result_tuple[0],
             box=result_tuple[1])
-    result.save(output_filename)
+
+    # If the image wasn't perfectly divisible by the tile dimensions, we'll spill over outside our desired final image dimensions. Save a copy of the uncropped then crop it and save a final version too.
+    prefix, ext = os.path.splitext(output_filename)
+    result.save(f'{prefix}_uncropped{ext}')
+    crop_image(result, output_width, output_height, center=False).save(output_filename)
 
 def save_final_choices(selected_filenames):
     """
