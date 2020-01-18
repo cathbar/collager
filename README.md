@@ -1,6 +1,6 @@
 # Collager
 I thought it would be cool to create an application that could recreate an image with a mosiac or collage of other images, referred to lovingly as "candidate images."
-The original idea started out as a quick jupyter notebook over a weekend, but I ended up syncing a bunch of time into it and now it's kind of a full-blown python script.
+The original idea started out as a quick jupyter notebook over a weekend, but I ended up sinking a bunch of time into it and now it's kind of a full-blown python script.
 
 ## Examples
 
