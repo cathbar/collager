@@ -2,7 +2,7 @@
 I thought it would be cool to create an application that could recreate an image with a mosiac or collage of other images, referred to lovingly as "candidate images."
 The original idea started out as a quick jupyter notebook over a weekend, but I ended up sinking a bunch of time into it and now it's kind of a full-blown thing.
 
-**Note: I don't own any of the images presented in this README.**
+**Note: I don't own any of the images presented in this README. Also, imagenet has some... interesting images in it. I don't take any responsibility for the weird stuff that might end up in these examples.**
 
 ## Examples
 
