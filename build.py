@@ -42,7 +42,6 @@ def get_closest_children(tile_dict, children_filenames, children_features, choic
     tile = tile_dict['tile']
 
     img_features = featurize_image(tile).get('features') # Featurize the target tile
-
     distances = metric_func(img_features, children_features)
     if choices < 1:
         print("Must provide a positive choice count.")
@@ -98,11 +97,18 @@ def _compute_options_concurrent_(target_image, children_filenames, candidate_fea
     for r, row in enumerate(tiles):
         for c, tile in enumerate(row):
             dicts.append({'row': r, 'column': c, 'tile': tile, 'tile_id': r * len(row) + c})
-
-    with multiprocessing.Pool(processes=processes) as pool:
-        result_dict_lists = list(
-            tqdm.tqdm(pool.imap(partial(get_closest_children, children_filenames=children_filenames, children_features=candidate_features, choices=candidate_choices, metric_func=metric_func), dicts), total=len(dicts)))
-
+    result_dict_lists = []
+    if processes > 1:
+        with multiprocessing.Pool(processes=processes) as pool:
+            result_dict_lists = list(
+                tqdm.tqdm(pool.imap(partial(get_closest_children, children_filenames=children_filenames, children_features=candidate_features, choices=candidate_choices, metric_func=metric_func), dicts), total=len(dicts)))
+    else:
+        pbar = tqdm.tqdm(total=len(tiles) * len(tiles[0]))
+        for dic in dicts:
+            result_dict_lists.append(get_closest_children(dic, children_filenames=children_filenames,
+                                        children_features=candidate_features, choices=candidate_choices,
+                                        metric_func=metric_func))
+            pbar.update(1)
     return pd.DataFrame(list(np.array(result_dict_lists).flatten()))
 
 def write_options(target_image_filename: str, feature_filename: str, tile_filename: str, candidate_choices: int,
@@ -122,6 +128,8 @@ def write_options(target_image_filename: str, feature_filename: str, tile_filena
     
     target_img = Image.open(target_image_filename)
     candidate_features = pd.read_pickle(feature_filename)['features']
+    # Drop any images that aren't RGB
+    candidate_features = candidate_features[candidate_features.str.len()==768] # Hacky AF
     candidate_filenames = list(candidate_features.index)
     candidate_features = np.array([list(t) for t in candidate_features.values])
     tile_width = math.ceil(float(target_img.size[0]) / tiles_per_row)
