@@ -21,7 +21,7 @@ conda env create -f environment.yml
 ```
 
 ### Dataset
-I tested on my vacation photos, but I want a demoable dataset, so let's download some imagenet images to get us started. If you already have a dataset though, feel free to skip this step.
+I tested on my vacation photos, but I want a demoable dataset, so let's download some imagenet images to get us started. If you already have a dataset though, feel free to skip this step. Also, I'm not including the `features.pickle` of this dataset so you can definitely skip this if you want.
 
 ```
 pip install awscli
