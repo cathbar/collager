@@ -6,7 +6,7 @@ The original idea started out as a quick jupyter notebook over a weekend, but I 
 
 ## Examples
 
-<img src="examples/target0.jpg" width="300"/> <img src="examples/tiled0.jpg" width="300"/> <img src="examples/tiled0_250.jpg" width="300"/>
+<img src="examples/tiled0.gif"/>
 
 <img src="examples/target1.jpg" width="300"/> <img src="examples/tiled1_150.jpg" width="300"/> <img src="examples/tile_details.jpg" width="300"/>
 
