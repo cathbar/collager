@@ -119,7 +119,7 @@ def load_tile(tuple, crop=None, aspect_ratio=None, tile_width=None, tile_height=
         return resize_image(Image.open(tuple.get('filename')), width=tile_width, height=tile_height), (tuple.get('c') * tile_width, tuple.get('r') * tile_height)
 
 
-def tile(tile_filename: str, output_filename: str, output_width: int, output_height: int, aspect_ratio: float, crop: bool = True):
+def tile(tile_filename: str, output_filename: str, output_width: int, output_height: int, aspect_ratio: float, processes: int, crop: bool = True):
     """
     Do the tiling. This leverages multiprocessing for loading the tiles from disk, but keep in mind that as of now,
     all of these resized candidate images are going to sit in memory and then be pasted into the final result image.
@@ -169,10 +169,11 @@ def tile(tile_filename: str, output_filename: str, output_width: int, output_hei
             })
             row_filenames.append(filename)
         selected_filenames.append(row_filenames)
-    with multiprocessing.Pool(processes=4) as pool:
+    with multiprocessing.Pool(processes=processes) as pool:
         result_tuple_list = list(
             tqdm.tqdm(pool.imap(partial(load_tile, crop=crop, aspect_ratio=aspect_ratio, tile_width=tile_width, tile_height=tile_height), tuples), total=len(tuples), desc='Loading tiles into memory.'))
-    save_final_choices(selected_filenames)
+    # input_tile_path, ext = os.path.splitext(tile_filename)
+    # save_final_choices(selected_filenames, f'{input_tile_path}_final{ext}')
     for result_tuple in tqdm.tqdm(result_tuple_list, desc='Creating actual collage image'):
         result.paste(
             im=result_tuple[0],
@@ -183,7 +184,7 @@ def tile(tile_filename: str, output_filename: str, output_width: int, output_hei
     result.save(f'{prefix}_uncropped{ext}')
     crop_image(result, output_width, output_height, center=False).save(output_filename)
 
-def save_final_choices(selected_filenames):
+def save_final_choices(selected_filenames, filename):
     """
     Write the tile choices out to a csv. This doesn't really serve a purpose now, but I could imagine a scenario in
     which I'd like to change some tiles in a finalized image. In that case, we could just modify this and then provide
@@ -198,4 +199,4 @@ def save_final_choices(selected_filenames):
         for c, filename in enumerate(row):
             dicts.append({'tile_id': r * len(row) + c, 'row': r, 'col': c, 'choice': 0, 'filename': filename})
     df = pd.DataFrame(dicts)
-    df.to_csv('data/tiles_final.csv', index=False)
+    df.to_csv(filename, index=False)

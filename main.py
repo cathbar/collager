@@ -57,6 +57,9 @@ def parse_args():
     parser_tile.add_argument('--tile_aspect_ratio', nargs='?', type=float,
                                 help='What aspect ratio should the tiles have?',
                                 default=1.5)
+    parser_tile.add_argument('--processes', nargs='?', type=int,
+                                help='How many concurrent processes should we put towards this?',
+                                default=4)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -67,6 +70,6 @@ if __name__ == '__main__':
         df = write_options(args.target_image, args.feature_file, args.tile_file, args.candidate_choices,
                            int(args.tiles_per_row), float(args.tile_aspect_ratio), args.comparison_func, processes=args.processes)
     elif args.command == TILE_COMMAND:
-        tile(args.tile_file, args.tiled_image, args.width, args.height, args.tile_aspect_ratio, args.choice)
+        tile(args.tile_file, args.tiled_image, args.width, args.height, args.tile_aspect_ratio, args.processes)
     else:
         print('Unknown command.')
